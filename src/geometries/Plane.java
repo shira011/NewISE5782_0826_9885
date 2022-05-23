@@ -1,99 +1,111 @@
 package geometries;
 
+import primitives.*;
+
 import java.util.List;
+
 import static primitives.Util.alignZero;
 import static primitives.Util.isZero;
-
-import primitives.Point;
-import primitives.Ray;
-import primitives.Vector;
+import java.util.LinkedList;
 
 public class Plane extends Geometry {
-    Point p0;
-    Vector normal;
-    public Plane(Point p1,Vector normal1){
-        p0=p1;
-        normal=normal1;
-    }
-    public Plane(Point p1,Point p2,Point p3){
-        p0=p1;
-        Vector vec1=(p2.subtract(p1));
-        Vector vec2=(p3.subtract(p1));
-        normal = vec1.crossProduct(vec2).normalize();//According to the formula
-    }
-    public Vector getNormal(Point p){
-        return normal;}
+    final Point q0;
+    final Vector normal;
 
-    public Point getPoint(){
-        return p0;
+
+    /*************** ctors *****************/
+    /**
+     * ctor that gets 2 parameters
+     * @param q2
+     * @param normal2
+     */
+
+    public Plane(Vector normal2,Point q2) {
+        this.normal = normal2.normalize();
+        this.q0 = q2;
+    }
+    /**
+     * ctor that gets 3 points
+     * @param p1
+     * @param p2
+     * @param p3
+     */
+    public Plane(Point p1,Point p2,Point p3) {
+        q0 = p1;
+        Vector U = (Vector) p2.subtract(p1);
+        Vector V = (Vector) p3.subtract(p1);
+        Vector N = U.crossProduct(V);
+        normal = N.normalize();
+    }
+    /*************** get *****************/
+    /**
+     * @return q0 of the plane
+     */
+    public Point GetQ0() {
+        return q0;
     }
 
-    public Vector getNormal(){
-        return normal;}
+    /**
+     * @param p
+     * @return the normal vector
+     */
+
     @Override
-    public List<GeoPoint> findGeoIntersections(Ray ray) throws IllegalArgumentException {
-        double nv = normal.dotProduct(ray.getDr());
-        if (isZero(nv))
-        {
-            return null;
-        }
-
-        try
-        {
-            Vector pSubtractP0 = p0.subtract(ray.getPoint1());
-            double t = alignZero((normal.dotProduct(pSubtractP0))/nv);
-
-            if(t <= 0)
-            {
-                return null;
-            }
-            return List.of(new GeoPoint(this,ray.getPoint(t)));
-        }
-        catch(Exception ex)
-        {
-            return null;
-        }
+    public Vector getNormal(Point p) {
+        /*return new Vector(p.add(normal));*/
+        return normal;
     }
+
+    /*************** normalize *****************/
+    /**
+     * @return the normal vector
+     */
+
+    public Vector getNormal() {
+        return normal;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Plane [q0=" + q0 + ", normal=" + normal + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof Ray))
+            return false;
+        Plane other = (Plane) obj;
+        return this.normal.equals(other.normal)&&this.q0.equals(other.q0);
+    }
+
+
+    /*************** intersections *****************/
+    /**
+     * @param ray
+     * @return a list of GeoPoints- intersections of the ray with the plane, and this plane
+     */
+
+
 
     public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        Point P0 = ray.getPoint1();
-        Vector v = ray.getDr();
 
-        Vector n = normal;
-
-        if (p0.equals(P0)) {
+        if (ray.getPoint().equals(q0) || isZero(this.normal.dotProduct(ray.getVector()))
+                || isZero(this.normal.dotProduct(q0.subtract(ray.getPoint()))))
             return null;
-        }
 
-        Vector P0_Q0 = p0.subtract(P0);
-
-        //numerator
-        double nP0Q0 = alignZero(n.dotProduct(P0_Q0));
-
-        //
-        if (isZero(nP0Q0)) {
+        double t = (this.normal.dotProduct(q0.subtract(ray.getPoint()))) / (this.normal.dotProduct(ray.getVector()));
+        if (t < 0) // In case there is no intersection with the plane return null
             return null;
-        }
 
-        //denominator
-        double nv = alignZero(n.dotProduct(v));
-
-        // ray is lying in the plane axis
-        if (isZero(nv)) {
-            return null;
-        }
-
-        double t = alignZero(nP0Q0 / nv);
-
-        if (t <= 0) {
-            return null;
-        }
-
-
-        Point point = ray.getPoint(t);
-        GeoPoint gPoint = new GeoPoint(this,point);
-
-        return List.of(gPoint);
+        //In case there is intersection with the plane return the point
+        GeoPoint p = new GeoPoint(this, ray.getPoint(t));
+        LinkedList<GeoPoint> result = new LinkedList<GeoPoint>();
+        result.add(p);
+        return result;
     }
-
 }

@@ -1,181 +1,119 @@
 package renderer;
-import primitives.*;
-import static primitives.Util.*;
 
+import geometries.Intersectable;
+import primitives.*;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
-/**
- * class camera in the package renderer
- * The purpose of the class is to create rays from the camera towards the various geometries of the scene.
- *
- */
 
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
+
+/**
+ * camera producing ray through a view plane
+ */
 public class Camera {
-    private Point p0; //location of camera
-    private Vector vUp;
-    private Vector vTo;
-    private Vector vRight;
-    private double width;
-    private double height;
-    private double distance;
+
+
+    private Vector _vTo;            // vector pointing towards the scene
+    private Vector _vUp;            // vector pointing upwards
+    private Vector _vRight;
+    private Point _p0;             // camera eye
+
+    private double _distance;       // camera distance from view plane
+    private double _width;          // view plane width
+    private double _height;         // view plane height
     private ImageWriter imageWriter;
     private RayTracerBase rayTracer;
 
-
-    /**
-     * Constructor to create new camera
-     *
-     * @param vTo Vector value
-     * @param vUp Vector value
-     * @param p0 Point3D value
-     * @return Camera
-     * @throws Exception
-     */
-    public Camera(Point p0, Vector vTo, Vector vUp) throws IllegalArgumentException
-    {
-        if(!isZero(vTo.dotProduct(vUp))) // if vTo doesn't orthogonal to vUp
-            throw new IllegalArgumentException("vUp doesnt ortogonal to vTo");
-
-        //all the vectors need to be normalize:
-        this.vTo = vTo.normalize();
-        this.vUp = vUp.normalize();
-        vRight = (vTo.crossProduct(vUp)).normalize();
-
-        this.p0 = p0;
-
+    public Vector getvTo() {
+        return _vTo;
     }
 
+    public Vector getvUp() {
+        return _vUp;
+    }
+
+    public Vector getvRight() {
+        return _vRight;
+    }
+
+    public Point getP0() {
+        return _p0;
+    }
+
+    public double getDistance() {
+        return _distance;
+    }
+
+    public double getWidth() {
+        return _width;
+    }
+
+    public double getHeight() {
+        return _height;
+    }
+
+
     /**
-     * Set View Plane size
-     *
-     * @param width double value
-     * @param height double value
-     * @return Camera
+     * @param p0  origin point in 3D space
+     * @param vUp
+     * @param vTo
      */
-    public Camera setVPSize(double width, double height)
-    {
-        this.width = width;
-        this.height = height;
+    public Camera(Point p0, Vector vTo, Vector vUp) {
+        if (!isZero(vUp.dotProduct(vTo)))
+            throw new IllegalArgumentException("vTo and vUp should be orthogonal");
+        _p0 = p0;
+
+        _vTo = vTo.normalize();
+        _vUp = vUp.normalize();
+
+        _vRight = _vTo.crossProduct(vUp).normalize();
+    }
+
+    // chaining methods
+
+    /**
+     * set distance between the camera and its view plane
+     *
+     * @param distance the distnace for the view plane alligator
+     * @return instance of camera for chaining
+     */
+    public Camera setVPDistance(double distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("Illegal value of distance");
+        }
+        _distance = distance;
         return this;
     }
 
     /**
-     * Set View Plane distance
+     * set view plane size
      *
-     * @param distance double value
-     * @return Camera
+     * @param width  physical width
+     * @param height physical height
+     * @return
      */
-    public Camera setVPDistance(double distance)
-    {
-        this.distance = distance;
+    public Camera setVPSize(double width, double height) {
+        if (width <= 0 || height <= 0)
+            throw new IllegalArgumentException("Width or height cannot be negative!");
+        this._width = width;
+        this._height = height;
         return this;
     }
-
-    /**
-     * Constructing a ray through a pixel
-     *
-     * @param Nx
-     * @param Ny
-     * @param j
-     * @param i
-     * @return ray from the camera to Pixel[i,j]
-     */
-    public Ray constructRay(int Nx, int Ny, int j, int i) {
-
-        // Image center ---> Pc = p0 + distance * vTo
-        Point Pc = p0.add(vTo.scale(distance));
-
-        // Ratio (pixel height & width)
-        double Ry = (double) height / Ny;
-        double Rx = (double) width / Nx;
-
-        Point Pij = Pc;
-        double yI = -(i - (Ny - 1) / 2d) * Ry;
-        double xJ = (j - (Nx - 1) / 2d) * Rx;
-
-        // movement to middle of pixel ij
-        if (!isZero(xJ)) {
-            Pij = Pij.add(vRight.scale(xJ));
-        }
-        if (!isZero(yI)) {
-            Pij = Pij.add(vUp.scale(yI));
-        }
-        //return ray from camera to view plane ij coordinates
-        return new Ray(p0, Pij.subtract(p0));
-    }
-
-
 
     public Camera setImageWriter(ImageWriter imageWriter) {
-        this.imageWriter=imageWriter;
+        this.imageWriter = imageWriter;
         return this;
     }
-    public Camera setRayTracer(RayTracerBase rayTracer) {
-        this.rayTracer=rayTracer;
+
+    public Camera setRayTracer(RayTracerBasic rayTracer) {
+        this.rayTracer = rayTracer;
         return this;
     }
-    /**
-     * @return the p0
-     */
-    public Point getP0() {
-        return p0;
-    }
 
-    /**
-     * @return the vUp
-     */
-    public Vector getvUp() {
-        return vUp;
-    }
 
-    /**
-     * @return the vTo
-     */
-    public Vector getvTo() {
-        return vTo;
-    }
-
-    /**
-     * @return the vRight
-     */
-    public Vector getvRight() {
-        return vRight;
-    }
-
-    /**
-     * @return the width
-     */
-    public double getWidth() {
-        return width;
-    }
-
-    /**
-     * @return the height
-     */
-    public double getHeight() {
-        return height;
-    }
-
-    /**
-     * @return the distance
-     */
-    public double getDistance() {
-        return distance;
-    }
-    public Camera getImageWriter()
-    {
-        return this;
-    }
-    public RayTracerBase getRayTracerBase() {
-        return this.rayTracer;
-    }
-    /**
-     * The function transfers beams from camera to pixel, tracks the beam
-     *  and receives the pixel color from the point of intersection
-     *
-     * @author
-     * @throws Exception
-     */
 
     public Camera renderImage() {
         try {
@@ -199,41 +137,105 @@ public class Camera {
         }
         return this;
     }
+
     private Color castRay(int nX, int nY, int j, int i) {
         Ray ray = constructRay(nX, nY, j, i);
         Color pixelColor = rayTracer.traceRay(ray);
         return pixelColor;
     }
-    /**
-     * A function that creates a grid of lines
-     *
-     * @param interval int value
-     * @param color Color value
-     * */
-    public void printGrid(int interval, Color color)
-    {
-        if (imageWriter == null)
-            throw new MissingResourceException("this function must have values in all the fileds", "ImageWriter", "imageWriter");
 
-        for (int i = 0; i < imageWriter.getNx(); i++){
-            for (int j = 0; j < imageWriter.getNy(); j++)	{
-                if(i % interval == 0 || j % interval == 0)
-                    imageWriter.writePixel(i, j, color);
+    public void printGrid(int interval, Color color) {
+        if (imageWriter == null)
+            throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
+        int nX = imageWriter.getNx();
+        int nY = imageWriter.getNy();
+        for (int i = 0; i < nY; i++) {
+            for (int j = 0; j < nX; j++) {
+                if (i % interval == 0 || j % interval == 0) {
+                    imageWriter.writePixel(j, i, color);
+                }
             }
         }
     }
 
-    /**
-     * A function that finally creates the image.
-     * This function delegates the function of a class imageWriter
-     *
-     * @author
-     * */
-    public void writeToImage()	{
+    public void writeToImage() {
         if (imageWriter == null)
-            throw new MissingResourceException("this function must have values in all the fileds", "ImageWriter", "imageWriter");
-
+            throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
         imageWriter.writeToImage();
+
     }
 
+
+    public List<Intersectable.GeoPoint> findRay(int nX, int nY, Intersectable intersect) {
+        Ray ray;
+        List<Intersectable.GeoPoint> result = new LinkedList<>();
+        List<Intersectable.GeoPoint> intersectionPoints;
+
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j < _height; j++) {
+                ray = constructRay(nX, nY, i, j);
+                intersectionPoints = intersect.findGeoIntersections(ray) ;
+                if (intersectionPoints != null) {
+                    result.addAll(intersectionPoints);
+                }
+            }
+        }
+        return result.isEmpty() ? null : result;
+    }
+    public Ray constructRay(int nX, int nY, int j, int i) {
+        Vector dir;
+        Point pCenter, pCenterPixel;
+        double ratioY, ratioX, yI, xJ;
+
+        pCenter = _p0.add(_vTo.scale(_distance)); //give us the center of the pixel
+        ratioY = alignZero(_height / nY);
+        ratioX = alignZero(_width / nX);
+
+        pCenterPixel = pCenter;
+        yI = alignZero(-1 * (i - (nY - 1) / 2d) * ratioY);
+        xJ = alignZero((j - (nX - 1) / 2d) * ratioX);
+        if (!isZero(xJ)) {
+            pCenterPixel = pCenterPixel.add(_vRight.scale(xJ));
+        }
+        if (!isZero(yI)) {
+            pCenterPixel = pCenterPixel.add(_vUp.scale(yI));
+        }
+        dir = pCenterPixel.subtract(_p0);
+
+        return new Ray(dir,_p0);
+    }
+    /**
+     * Calculates the ray that goes through the middle of a pixel i,j on the view
+     * plane
+     *
+     * @param nX
+     * @param nY
+     * @param j
+     * @param i
+     * @return The ray that goes through the middle of a pixel i,j on the view plane
+     */
+    public Ray constructRayThroughPixel(int nX, int nY, int j, int i) {
+        // Image center:
+        Point pC = _p0.add(_vTo.scale(this._distance));
+
+        // Ratio:
+        double Ry = _height / nY;
+        double Rx = _width / nX;
+
+        // Pixel[i,j] center
+        double yi = alignZero(-(i - (nY - 1) / 2.0) * Ry);
+        double xj = alignZero((j - (nX - 1) / 2.0) * Rx);
+
+        Point pIJ = pC;
+
+        // To avoid a zero vector exception
+        if (xj != 0)
+            pIJ = pIJ.add(_vRight.scale(xj));
+        if (yi != 0)
+            pIJ = pIJ.add(_vUp.scale(yi));
+
+        Vector vIJ = pIJ.subtract(this._p0);
+
+        return new Ray( vIJ, _p0);
+    }
 }

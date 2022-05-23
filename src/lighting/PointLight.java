@@ -1,67 +1,89 @@
-/**
- *
- */
 package lighting;
 
 import primitives.Color;
 import primitives.Point;
 import primitives.Vector;
 
-/**
- * @author äîçùá ùìé
- *
- */
-public class PointLight extends Light implements LightSource {
-
+public class PointLight extends Light implements LightSource{
     private Point position;
-    private double KC = 1;
-    private double KL = 0;
-    private double KQ = 0;
-
-    public PointLight(Color intensity, Point position)
-    {
+    private double kC = 1,kL=0,kQ=0;
+    private Vector kk = new Vector(1,0,0);
+    /**
+     * constructor for light
+     *
+     * @param intensity
+     * @return the intensity
+     * @author shira suissa & talya moshe
+     */
+    public PointLight(Color intensity, Point p) {
         super(intensity);
-        this.position = position;
+        this.position = p;
     }
 
-    @Override
-    public Color getIntensity(Point p) throws IllegalArgumentException
+    /**
+     * setter to filed kc
+     *
+     * @author shira suissa & talya moshe
+     * @param KC the kC to set
+     * @return the object - builder
+     */
+    public PointLight setKC(double KC)
     {
-        return getIntensity().reduce((KC + KL * p.distance(position)+ KQ * p.distanceSquared(position)));
-    }
-
-    @Override
-    public Vector getL(Point p) throws IllegalArgumentException
-    {
-        if (p.equals(position))
-            return null; //In order not to reach a state of exception due to the zero vector
-        return p.subtract(position).normalize();
+        kC = KC;
+        return this;
     }
 
     /**
      * setter to filed kl
-     * @param kL the kL to set
+     *
+     * @author shira suissa & talya moshe
+     * @param KL the kL to set
      * @return the object - builder
      */
-    public PointLight setKL(double kL)
+    public PointLight setKl(double KL)
     {
-        KL = kL;
+        kL = KL;
         return this;
     }
 
 
     /**
      * setter to filed kq
-     * @param kQ the kQ to set
+     *
+     * @author shira suissa & talya moshe
+     * @param KQ the kQ to set
      * @return the object - builder
      */
-    public PointLight setKQ(double kQ)
+    public PointLight setKQ(double KQ)
     {
-        KQ = kQ;
+        kQ = KQ;
         return this;
     }
-    public double getDistance(Point point)
+
+    @Override
+    public Color getIntensity(Point p) {
+        double d = position.distance(p);
+        Color iL = getIntensity().scale((1 / (kC + kL * d + kQ * d * d)));
+        return iL;
+    }
+
+    @Override
+    public Vector getL(Point p) {
+        return p.subtract(position).normalize();
+    }
+    /**
+     * setter to filed position
+     *
+     * @author shira suissa & talya moshe
+     * @param position the position to set
+     * @return the object - builder
+     */
+    public PointLight setPosition(Point position)
     {
+        this.position = position;
+        return this;
+    }
+    public double getDistance(Point point) {
         return position.distance(point);
     }
 }

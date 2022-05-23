@@ -1,38 +1,18 @@
-/**
- *
- */
 package primitives;
 
-/**
- * @author äîçùá ùìé
- *
- */
 public class Material {
-
     public int nShininess=0;
-    public Double3 Kd=new  Double3(0);
-    public Double3 Ks=new  Double3(0);
-    public Double3 kT =new Double3(0);
+    public Double3 KD= new Double3(0);
+    public Double3 KS = new Double3(0);
+    public Double3 KT= new Double3(0);
+    //public Double3 KR=new Double3(0);
 
-    /**
-     * Material's reflection-factor
-     */
-    public Double3 kR =new Double3(0);
+    public Double3 KR =new Double3(0);
 
-
-
-    public Double3 getKd()
-    {
-        return Kd;
-    }
-    public Double3 getKs()
-    {
-        return Ks;
-    }
     /**
      * @param nShininess the nShininess to set
      */
-    public Material setnShininess(int nShininess)
+    public Material setShininess(int nShininess)
     {
         this.nShininess = nShininess;
         return this;
@@ -44,44 +24,54 @@ public class Material {
      */
     public Material setKd(double kD)
     {
-        Kd= new  Double3(kD);
+        KD = new Double3(kD);
         return this;
     }
-    public Material setKd(Double3 kD)
-    {
-        Kd= kD;
-        return this;
-    }
-    /**
-     * @param kS the kS to set
+    /* set KD
+     * @param kD
+     * @return
      */
-    public Material setKs(double kS)
-    {
-        Ks = new  Double3(kS);
-        return this;
-    }
-    public Material setKs(Double3 kS)
-    {
-        Ks =kS;
-        return this;
-    }
-    /**
-     * Setter to the material's Kt transparency-factor
-     * @param kT the material's Kt transparency-factor
-     * @return The updated material
-     */
-    public Material setKt(double kT) {
-        this.kT = new Double3(kT);
+    public Material setKD(Double3 kD){
+        this.KD = kD;
         return this;
     }
 
     /**
-     * Setter to the material's Kr reflection-factor
-     * @param kR the material's Kr reflection-factor
-     * @return The updated material
+     * @param _kS the kS to set
      */
-    public Material setKr(double kR) {
-        this.kR = new Double3(kR);
+    public Material setKs(double _kS)
+    {
+        KS = new Double3(_kS);
         return this;
     }
+    /* set KS
+     * @param kS
+     * @return
+     */
+    public Material setKS(Double3 kS){
+        this.KS = kS;
+        return this;
+    }
+    public Material setKt(double kT) {
+        this.KT = new Double3(kT);
+        return this;
+    }
+    public Material setKr(double kR) {
+        this.KR = new Double3(kR);
+        return this;
+    }
+    /*public Material setKT(double kT)
+    {
+        KT = new Double3(kT);
+        return this;
+    }*/
+
+    /*//**
+     * @param kR the kR to set
+     */
+    /*public Material setKR(double kR)
+    {
+        KR = new Double3(kR);
+        return this;
+    }*/
 }

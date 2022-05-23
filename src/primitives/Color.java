@@ -27,6 +27,18 @@ public class Color {
         rgb = Double3.ZERO;
     }
 
+
+    /**
+     * Constructor to generate a color according to RGB components Each component in
+     * range 0..255 (for printed white color) or more [for lights]
+     *
+     * @param rgb triad of Red/Green/Blue components
+     */
+    private Color(Double3 rgb) {
+        if (rgb.d1 < 0 || rgb.d2 < 0 || rgb.d3 < 0)
+            throw new IllegalArgumentException("Negative color component is illegal");
+        this.rgb = rgb;
+    }
     /**
      * Constructor to generate a color according to RGB components Each component in
      * range 0..255 (for printed white color) or more [for lights]
@@ -41,19 +53,6 @@ public class Color {
         rgb = new Double3(r, g, b);
     }
 
-
-    /**
-     * Constructor to generate a color according to RGB components Each component in
-     * range 0..255 (for printed white color) or more [for lights]
-     *
-     * @param rgb triad of Red/Green/Blue components
-     */
-    private Color(Double3 rgb) {
-        if (rgb.d1 < 0 || rgb.d2 < 0 || rgb.d3 < 0)
-            throw new IllegalArgumentException("Negative color component is illegal");
-        this.rgb = rgb;
-    }
-
     /**
      * Constructor on base of java.awt.Color object
      *
@@ -62,6 +61,7 @@ public class Color {
     public Color(java.awt.Color other) {
         rgb = new Double3(other.getRed(), other.getGreen(), other.getBlue());
     }
+
 
     /**
      * Color getter - returns the color after converting it into java.awt.Color

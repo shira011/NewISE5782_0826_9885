@@ -48,7 +48,6 @@ public class Double3 {
         this.d2 = value;
         this.d3 = value;
     }
-    //kj
 
     @Override
     public boolean equals(Object obj) {

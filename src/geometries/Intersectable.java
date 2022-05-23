@@ -1,13 +1,21 @@
 package geometries;
 
+
+import primitives.Ray;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
+import primitives.Point;
 
-import primitives.*;
+public abstract class Intersectable{
 
-public abstract class Intersectable {
-
+    /**
+     * A function that return all the intersection point with geometry
+     *
+     * @param ray
+     * @return List<Point>
+     * @throws Exception
+     * */
     public List<Point> findIntersections(Ray ray) {
         var geoList = findGeoIntersections(ray);
         return geoList == null ? null
@@ -15,39 +23,41 @@ public abstract class Intersectable {
     }
 
 
-
-    public List<GeoPoint> findGeoIntersections (Ray ray){
-        return findGeoIntersectionsHelper(ray);
-    }
-    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);
-
-
-    public static class GeoPoint
-    {
+    public static class GeoPoint {
         public Geometry geometry;
         public Point point;
 
-        //vvbmphnmt4h4
-
+        @Override
+        public String toString() {
+            return "GeoPoint [geometry=" + geometry + ", point=" + point + "]";
+        }
+        /**
+         * constructor for geo point
+         *
+         * @param geometry Geometry
+         * @param point Point3D
+         * */
         public GeoPoint(Geometry geometry,Point point)
         {
             this.geometry = geometry;
             this.point = point;
         }
-
         @Override
-        public boolean equals(Object obj)
-        {
+        public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null) return false;
             if (!(obj instanceof GeoPoint)) return false;
             GeoPoint other = (GeoPoint)obj;
-            return this.geometry.equals(other.geometry) && this.point.equals(other.point);
-        }
-        @Override
-        public String toString() {
-            return "GP{" + "G=" + geometry + ", P=" + point + '}';
+            return this.geometry== other.geometry && this.point.equals(other.point);
         }
 
     }
+    public List<GeoPoint> findGeoIntersections (Ray ray){
+        return findGeoIntersectionsHelper(ray);
+    }
+    protected abstract List<GeoPoint> findGeoIntersectionsHelper(Ray ray);//{
+    //	return null;
+    //}
+
 }
+

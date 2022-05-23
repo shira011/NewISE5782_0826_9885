@@ -1,104 +1,79 @@
 package geometries;
 
-import java.util.List;
-import static primitives.Util.alignZero;
-
-
 import primitives.Point;
 import primitives.Ray;
+import primitives.Util;
 import primitives.Vector;
 
-public class Sphere extends Geometry  {
+import java.util.LinkedList;
+import java.util.List;
+
+import static primitives.Util.alignZero;
+import static primitives.Util.isZero;
+
+public class Sphere extends Geometry {
     Point center;
     double radius;
 
-    public Sphere(Point center1,double radius1) {
-        center=center1;
-        radius=radius1;
+
+    /*************** ctor *****************/
+    /**
+     * ctor that gets 2 parameters
+     * @param center
+     * @param radius
+     */
+    public Sphere(Point center, double radius) {
+        super();
+        if(isZero(radius) || radius < 0)
+            throw new IllegalArgumentException("Zero or negative radius");
+        this.center = center;
+        this.radius = radius;
     }
 
-	/*public Vector getNormal(Point p){
-		Vector v=new Vector(0,0,0);
-		v=this.center.subtract(p).normalize();
-	return v;
-	}*/
-
+    /*************** normalize *****************/
+    /**
+     * @return the normal
+     */
     @Override
-    public Vector getNormal(Point point) throws IllegalArgumentException
+    public Vector getNormal(Point p)
     {
-        return point.subtract(this.center).normalize();
+        Vector N = p.subtract(center);
+        return N.normalize();//the normal to sphere is the subtraction of the given point from the center. we get the normal vector
+    }
+    /*************** gets *****************/
+    /**
+     * @return the center
+     */
+    public Point getCenter() {
+        return center;
     }
 
-    @Override
-    public List<GeoPoint> findGeoIntersections(Ray ray) throws IllegalArgumentException {
-        if (ray.getPoint1().equals(center)) // if the begin of the ray in the center, the point, is on the radius
-            return List.of(new GeoPoint(this,ray.getPoint(radius)));
-        //List<Point3D> rayPoints = new ArrayList<Point3D>();
-        Vector u = center.subtract(ray.getPoint1());
-        double tM = alignZero(ray.getDr().dotProduct(u));
-        double d = alignZero(Math.sqrt(u.length()*u.length()- tM * tM));
-        double tH = alignZero(Math.sqrt(radius*radius - d*d));
-        double t1 = alignZero(tM+tH);
-        double t2 = alignZero(tM-tH);
-
-
-        if (d > radius)
-            return null; // there are no instructions
-
-
-        if (t1 <=0 && t2<=0)
-            return null;
-
-        if (t1 > 0 && t2 >0)
-            return List.of(new GeoPoint(this,ray.getPoint(t1)),new GeoPoint(this,ray.getPoint(t2)));
-        if (t1 > 0)
-        {
-            return List.of(new GeoPoint(this,ray.getPoint(t1)));
-        }
-
-        else
-            return List.of(new GeoPoint(this,ray.getPoint(t2)));
+    /**
+     * @return the radius
+     */
+    public double getRadius() {
+        return radius;
     }
 
-	/*public List<GeoPoint> findGeoIntersections(Ray ray) throws IllegalArgumentException
-	{
-
-		if (ray.getPoint1().equals(center)) // if the begin of the ray in the center, the point, is on the radius
-			return List.of(new GeoPoint(this,ray.getPoint(radius)));
-		//List<Point3D> rayPoints = new ArrayList<Point3D>();
-		Vector u = center.subtract(ray.getPoint1());
-		double tM = alignZero(ray.getDr().dotProduct(u));
-		double d = alignZero(Math.sqrt(u.length()*u.length()- tM * tM));
-		double tH = alignZero(Math.sqrt(radius*radius - d*d));
-		double t1 = alignZero(tM+tH);
-		double t2 = alignZero(tM-tH);
-
-
-		if (d > radius)
-			return null; // there are no instructions
-
-		if (t1 <=0 && t2<=0)
-			return null;
-
-		if (t1 > 0 && t2 >0)
-			return List.of(new GeoPoint(this,ray.getPoint(t1)),new GeoPoint(this,ray.getPoint(t2)));
-		if (t1 > 0)
-		{
-			return List.of(new GeoPoint(this,ray.getPoint(t1)));
-		}
-		else
-			return List.of(new GeoPoint(this,ray.getPoint(t2)));
-	}*/
-
+    /*************** admin *****************/
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray)
+    public String toString() {
+        return "Sphere [center=" + center + ", radius=" + radius + "]";
+    }
+
+    /*************** intersections *****************/
+    /**
+     * @param ray
+     * @return a list of GeoPoints- intersections of the ray with the sphere, and this sphere
+     */
+ /*   @Override
+    public List<Point> findIntersections(Ray ray)
     {
-        Point P0 = ray.getPoint1();
-        Vector v = ray.getDr();
+        Point P0 = ray.getPoint();
+        Vector v = ray.getVector();
 
         if (P0.equals(center)) {
-            GeoPoint gPoint=new GeoPoint(this,center.add(v.scale(radius)));
-            return List.of(gPoint);
+            return List.of(center.add(v.scale(radius)));
         }
 
         Vector u = center.subtract(P0);
@@ -115,22 +90,63 @@ public class Sphere extends Geometry  {
         double t2 = alignZero(tm + th);
 
         if (t1 > 0 && t2 > 0) {
-            GeoPoint P1 =new GeoPoint(this, P0.add(v.scale(t1)));
-            GeoPoint P2 =new GeoPoint(this, P0.add(v.scale(t2)));
+            Point P1 = P0.add(v.scale(t1));
+            Point P2 = P0.add(v.scale(t2));
             return List.of(P1, P2);
         }
 
         if (t1 > 0) {
-            GeoPoint P1 = new GeoPoint(this,P0.add(v.scale(t1)));
+            Point P1 = P0.add(v.scale(t1));
             return List.of(P1);
         }
 
         if (t2 > 0) {
-            GeoPoint P2 = new GeoPoint(this, P0.add(v.scale(t2)));
+            Point P2 = P0.add(v.scale(t2));
             return List.of(P2);
         }
 
         return null;
+
+    }*/
+    @Override
+    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray)
+    {
+        double r = this.radius;
+
+        // Special case: if point p0 == center, that mean that all we need to calculate
+        // is the radios mult scalar with the direction, and add p0
+        if (center.equals(ray.getPoint())) {
+            LinkedList<GeoPoint> result = new LinkedList<GeoPoint>();
+            result.add(new GeoPoint(this, ray.getPoint(r)));
+            return result;
+        }
+
+        Vector u = center.subtract(ray.getPoint());
+        double tm = u.dotProduct(ray.getVector());
+        double d = Math.sqrt(alignZero(u.lengthSquared() - tm * tm));
+
+        if (d >= r) //also In case the cut is tangent to the object still return null - d = r
+            return null;
+
+        double th = Math.sqrt(r * r - d * d);
+        double t1 = tm + th;
+        double t2 = tm - th;
+
+        if(alignZero(t1) > 0 || alignZero(t2) > 0){
+            LinkedList<GeoPoint> result = new LinkedList<GeoPoint>();
+            if(alignZero(t1) > 0){
+                Point p1 = ray.getPoint(t1);
+                result.add(new GeoPoint(this, p1));
+            }
+            if(alignZero(t2) > 0){
+                Point p2 = ray.getPoint(t2);
+                result.add(new GeoPoint(this, p2));
+            }
+            return result;
+        }
+        else { //In case there are no intersections points
+            return null;
+        }
 
     }
 

@@ -1,85 +1,106 @@
 package primitives;
 
-import geometries.Intersectable.GeoPoint;
-import java.util.List;
+import static primitives.Util.isZero;
+//import static renderer.RayTracerBasic.DELTA;
 
-import geometries.Intersectable.GeoPoint;
+import geometries.Intersectable;
+import geometries.Intersectable.*;
+import  primitives.Vector;
+
+import java.util.List;
+import java.util.Objects;
 
 public class Ray {
-
-    Point p0;
-    Vector dr;
-
+    Point p;
+    Vector v;
     private static final double DELTA = 0.1;
-
-    public Ray(Point p,Vector dr1) {
-        p0=p;
-        dr=dr1;
+    /*************** ctor *****************/
+    /**
+     * ctor that gets 2 parameteres
+     * @param p2
+     * @param v2
+     */
+    public Ray(Vector v2, Point p2) {
+        super();
+        p = p2;
+        v = v2.normalize();
     }
-
-	/*public Ray(Point p0, Vector dir)
-    {
-        if(!(dir.length() == 1))
-            this.dr = dir.normalize();
-        else this.dr = dir;
-        this.p0 = p0;
-    }*/
+    public Ray( Point p2,Vector v2) {
+        super();
+        p = p2;
+        v = v2.normalize();
+    }
 
     public Ray(Point head, Vector lightDirection, Vector n)
     {
         if(primitives.Util.alignZero(lightDirection.dotProduct(n)) < 0)
-            p0= head.add(n.scale(-DELTA));
+            p= head.add(n.scale(-DELTA));
         else if(primitives.Util.alignZero(lightDirection.dotProduct(n)) > 0)
-            p0= head.add(n.scale(DELTA));
+            p= head.add(n.scale(DELTA));
         else if(primitives.Util.isZero(lightDirection.dotProduct(n)))
-            p0=head;
-        dr=lightDirection;
-        dr.normalize();
+            p=head;
+        v=lightDirection;
+        v.normalize();
     }
+
+    public Point getPoint(){
+        return  this.p;}
+    public Vector getVector(){return  this.v;}
+    /**
+     * this function gets a list of (intersection) points,
+     * and returns the closest point from them to p0-beginning of this ray.
+     * @param points
+     * @return closestP
+     */
+    public Point findClosestPoint(List<Point> points) {
+        return points == null || points.isEmpty() ? null
+                : findClosestGeoPoint(points.stream().map(p -> new Intersectable.GeoPoint(null, p)).toList()).point;
+    }
+
+    /**
+     *
+     * @param geoPoints
+     * @return The closest point to the began of the ray
+     */
+    public Intersectable.GeoPoint findClosestGeoPoint(List<Intersectable.GeoPoint> geoPoints) {
+
+        if (geoPoints == null) //In case of an empty list
+            return null;
+        Intersectable.GeoPoint closePoint = geoPoints.get(0); //Save the first point in the list
+        for (Intersectable.GeoPoint p : geoPoints) {
+            if (closePoint.point.distance(this.p) > p.point.distance(this.p)) //In case the distance of closes point is bigger than the p point
+                closePoint = p;
+        }
+        return closePoint;
+    }
+
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (!(obj instanceof Point)) return false;
+        if (!(obj instanceof Ray)) return false;
         Ray other = (Ray)obj;
-        return p0.equals(other.p0)&&dr.equals(other.dr);
-    }
-    public String toString() {
-        return p0.toString()+" "+dr.toString();
-    }
-    public Point getPoint1(){
-        return p0;
-    }
-    public Vector getDr() {
-        return dr.normalize();
-    }
-    public Point getPoint(double t) throws IllegalArgumentException{
-        return p0.add(dr.scale(t));
-    }
-    /**
-     * The function returns the point closest to the beginning of the beam
-     * from all the intersection points of the resulting list.
-     *
-     * @param points List<Point> value
-     * @return Point3D value
-     * */
-    public Point findClosestPoint(List<Point> points) {
-        return points == null || points.isEmpty() ? null
-                : getClosestGeoPoint(points.stream().map(p -> new GeoPoint(null, p)).toList()).point;
+        return this.v.equals(other.v) && this.p.equals(other.p);
     }
 
-    public GeoPoint getClosestGeoPoint(List<GeoPoint> intersections){
-
-        if(intersections == null)
-            return null;
-        GeoPoint closet = intersections.get(0);
-        for (GeoPoint geoPoint : intersections)
-        {
-            if(geoPoint.point.distance(p0) < closet.point.distance(p0))
-                closet= geoPoint;
-
+    public Point getPoint(double t)
+    {
+        if(isZero(t)){
+            throw new IllegalArgumentException("t is equal to 0 produce an illegal ZERO vector");
         }
-        return closet;
+        return p.add(v.scale(t));
+        //Point tmp=new Point(p.dPoint.d1 ,p.dPoint.d2,p.dPoint.d3);
+        //return isZero(t) ? p : tmp.add(v.scale(t));//takes the beginning of the ray and adds the vector*scalar point that we get.
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Ray [Point=" + p + ", Vector=" +v + "]";
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(p, v);
     }
 }

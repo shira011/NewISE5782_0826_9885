@@ -1,34 +1,31 @@
 package lighting;
 
-import primitives.Color;
-import primitives.Double3;
+import primitives.*;
 
-/**
- * @author äîçùá ùìé
- *
- */
-public class AmbientLight extends Light {
+public class AmbientLight extends Light{
 
-    private Double3  Ka; //
-
-
+    /*************** ctor *****************/
     /**
-     * constructor that save the intensity=Ia*Ka
-     *
-     * @param Ia Color value
-     * @param Ka double value
+     * ctor that restarts Intensity of super class by Ia and ka
+     * @param Ia
+     * @param ka
      */
-    public AmbientLight(Color Ia,Double3 Ka ) {
-        super(Ia.scale(Ka));
+    public AmbientLight(Color Ia, Double3 ka) {
 
+        super(Ia.scale(ka));//the father is "Light"- the basic light class
     }
 
+    /*************** ctor *****************/
     /**
-     * A default constructor
-     * this c-tor put the defalt color - black to the ambition light
+     * ctor that restarts Intensity of super class by Ia and ka
      */
     public AmbientLight() {
-        super(Color.BLACK);
+        super(Color.BLACK);//the father is "Light"- the basic light class
     }
 
+    /*************** get *****************/
+    /**
+     * @return the Intensity
+     */
 }
+

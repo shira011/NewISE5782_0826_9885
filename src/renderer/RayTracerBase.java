@@ -1,40 +1,26 @@
-/**
- *
- */
 package renderer;
-import primitives.Ray;
-
-import java.util.List;
 
 import primitives.Color;
+import primitives.Ray;
 import scene.Scene;
 
-/**
- * @author äîçùá ùìé
- *
- */
 public abstract class RayTracerBase {
-
-    protected Scene myscene;
-
-      /**
-     * constructor
-     * @param myscene Scene value
-     */
-    public  RayTracerBase(Scene myscene)
-    {
-        this.myscene=myscene;
-    }
-
+    protected Scene scene;//the scene we will trace
 
     /**
-     * Statement of an abstract function that calculates the color for the nearest intersection point,
-     * if no intersection points are returned the color of the background
-     * @param ray Ray value
-     * @throws Exception
-     * @return Color
-     *  */
-    public abstract Color traceRay(Ray ray) throws IllegalArgumentException ;
+     * constructor that gets the scene
+     * @param _scene
+     */
+    public RayTracerBase(Scene _scene)
+    {
+        scene=_scene;
+    }
 
-    //protected abstract Color traceRay(List<Ray> rays);
+    /**
+     * abstract method
+     * @param ray
+     * @return the color of the pixel that the ray pass through it
+     */
+    public abstract Color traceRay(Ray ray);
+
 }

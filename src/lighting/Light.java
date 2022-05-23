@@ -1,21 +1,22 @@
-/**
- *
- */
 package lighting;
-
 import primitives.Color;
 
-/**
- * @author äîçùá ùìé
- *
- */
-public class Light {
 
-    protected Color intensity;//private?
+/**
+ * class for light - abstract class
+ *
+ * @author shira suissa & talya moshe
+ */
+abstract class Light
+{
+
+    private Color intensity;
 
 
     /**
      * constructor for light
+     *
+     * @author shira suissa & talya moshe
      * @return the intensity
      */
     protected Light(Color intensity)
@@ -25,10 +26,14 @@ public class Light {
 
     /**
      * getter to intensity
+     *
+     * @author shira suissa & talya moshe
      * @return intensity Color
      * */
     public Color getIntensity()
     {
         return intensity;
     }
+
+
 }

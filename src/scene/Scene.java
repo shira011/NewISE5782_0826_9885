@@ -1,74 +1,35 @@
 package scene;
 
+import geometries.Geometries;
+import lighting.LightSource;
+import primitives.Color;
+import lighting.AmbientLight;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import lighting.AmbientLight;
-import lighting.LightSource;
-import geometries.Geometries;
-import primitives.Color;
+public class Scene {
 
-/**
- * class Scene for PDS
- *
- * @author
- */
-public class Scene
-{
-    public String name;
-    public Color background = Color.BLACK;
-    public AmbientLight ambientLight = new AmbientLight();
-    public Geometries geometries;
-    public List<LightSource>lights=new LinkedList<LightSource>() ;
+    public String name;					//scene's name
+    public Color background=Color.BLACK;//default color of the background (unless it was changed)
+    public AmbientLight ambientLight=new AmbientLight();	//ambient light of the scene's objects
+    public Geometries geometries = new Geometries();//the geometries that are in the scene
+    public List<LightSource> lights = new LinkedList<>();
 
-
+    /*************** constructor *****************/
     /**
-     * constructor
-     *
-     * @author
-     * @param name
-     * */
-    public Scene(String name)
-    {
-        geometries = new Geometries();
-    }
-
-    public Color getbackground()
-    {
-        return background;
-    }
-    /**
-     * setter function to background, and return this for builder pattern
-     *
-     * @author
-     * @param background the background to set
+     * restart the name of scene and restarts an empty geometries list.
+     * @param _name
      */
-    public Scene setBackground(Color background)
-    {
-        this.background = background;
-        return this;
+    public Scene(String _name) {
+        name=_name;
+        geometries= new Geometries();//empty list of geometries
     }
 
-
+    /*************** setters *****************/
     /**
-     * setter function to ambientLight, and return this for builder pattern
-     *
-     * @author
-     * @param ambientLight the ambientLight to set
-     */
-    public Scene setAmbientLight(AmbientLight ambientLight)
-    {
-        this.ambientLight = ambientLight;
-        return this;
-
-    }
-
-
-    /**
-     * setter function to geometries, and return this for builder pattern
-     *
-     * @author
-     * @param geometries the geometries to set
+     * @param geometries
+     * @return the scene itself to allow design pattern of builder- to concatenate calls to setters.
      */
     public Scene setGeometries(Geometries geometries)
     {
@@ -76,10 +37,36 @@ public class Scene
         return this;
     }
 
+    /**
+     * @param ambientLight
+     * @return the scene itself to allow design pattern of builder- to concatenate calls to setters.
+     */
+    public Scene setAmbientLight(AmbientLight ambientLight)
+    {
+        this.ambientLight = ambientLight;
+        return this;
+    }
 
+    /**
+     * @param backGround
+     * @return the scene itself to allow design pattern of builder- to concatenate calls to setters.
+     */
+    public Scene setBackGround(Color backGround)
+    {
+        this.background = backGround;
+        return this;
+    }
+
+    /**
+     * setter function to lights  and return this for builder pattern
+     * @param lights the lights to set
+     */
     public Scene setLights(List<LightSource> lights)
     {
         this.lights = lights;
         return this;
     }
+
+
+
 }

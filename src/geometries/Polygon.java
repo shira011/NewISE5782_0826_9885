@@ -27,7 +27,6 @@ public class Polygon extends Geometry {
      * path. The polygon must be convex.
      *
      * @param vertices list of vertices according to their order by edge path
-     * @throws Exception
      * @throws IllegalArgumentException in any case of illegal combination of
      *                                  vertices:
      *                                  <ul>
@@ -44,7 +43,7 @@ public class Polygon extends Geometry {
      *                                  <li>The polygon is concave (not convex)</li>
      *                                  </ul>
      */
-    public Polygon(Point... vertices) throws IllegalArgumentException {
+    public Polygon(Point... vertices) {
         if (vertices.length < 3)
             throw new IllegalArgumentException("A polygon can't have less than 3 vertices");
         this.vertices = List.of(vertices);
@@ -90,17 +89,20 @@ public class Polygon extends Geometry {
         return plane.getNormal();
     }
 
+
+
     @Override
     public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
 
-        List<GeoPoint> planeIntersections = plane.findGeoIntersectionsHelper(ray);
+        return  null;
+       /* List<GeoPoint> planeIntersections = plane.findGeoIntersectionsHelper(ray);
 
         if (planeIntersections == null) {
             return null;
         }
 
-        Point P0 = ray.getPoint1();
-        Vector v = ray.getDr();
+        Point P0 = ray.getPoint();
+        Vector v = ray.getVector();
 
         Point P1 = vertices.get(1);
         Point P2 = vertices.get(0);
@@ -131,6 +133,9 @@ public class Polygon extends Geometry {
             }
         }
 
-        return planeIntersections;
+        return planeIntersections;*/
     }
 }
+
+
+
