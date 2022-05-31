@@ -147,7 +147,7 @@ public class ReflectionRefractionTests {
                 .setVPSize(150, 150) //
                 .setVPDistance(1000);
         ImageWriter imageWriter = new ImageWriter("ourPictureRefrectionRefraction", 600, 600);
-        camera1.setImageWriter(imageWriter) //
+        camera1.setNumOfRays(144).setImageWriter(imageWriter) //
                 .setRayTracer(new RayTracerBasic(scene)) //
                 .renderImage() //
                 .writeToImage(); //

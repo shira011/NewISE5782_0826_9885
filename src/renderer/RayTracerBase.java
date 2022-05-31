@@ -4,6 +4,8 @@ import primitives.Color;
 import primitives.Ray;
 import scene.Scene;
 
+import java.util.List;
+
 public abstract class RayTracerBase {
     protected Scene scene;//the scene we will trace
 
@@ -22,5 +24,6 @@ public abstract class RayTracerBase {
      * @return the color of the pixel that the ray pass through it
      */
     public abstract Color traceRay(Ray ray);
+    protected abstract Color traceRay(List<Ray> rays);
 
 }

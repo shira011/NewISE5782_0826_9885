@@ -3,6 +3,7 @@ package renderer;
 import geometries.Intersectable;
 import primitives.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -15,7 +16,7 @@ import static primitives.Util.isZero;
  */
 public class Camera {
 
-
+    private int numOfRays;
     private Vector _vTo;            // vector pointing towards the scene
     private Vector _vUp;            // vector pointing upwards
     private Vector _vRight;
@@ -129,7 +130,7 @@ public class Camera {
             int nY = imageWriter.getNy();
             for (int i = 0; i < nY; i++) {
                 for (int j = 0; j < nX; j++) {
-                    imageWriter.writePixel(j, i, castRay(nX, nY, j, i));
+                    imageWriter.writePixel(j, i, castRay(nX, nY, j, i,numOfRays));
                 }
             }
         } catch (MissingResourceException e) {
@@ -138,10 +139,24 @@ public class Camera {
         return this;
     }
 
-    private Color castRay(int nX, int nY, int j, int i) {
-        Ray ray = constructRay(nX, nY, j, i);
+    private Color castRay(int nX, int nY, int j, int i, int numOfRays) {
+        Color color;
+        if(numOfRays == 1 || numOfRays == 0)
+        {
+            Ray ray = constructRayThroughPixel(nX, nY, j, i);
+             color = rayTracer.traceRay(ray);
+            imageWriter.writePixel(j, i, color);
+        }
+        else
+        {
+            List<Ray> rays = constructBeamThroughPixel(nX, nY, j, i,numOfRays);
+             color = rayTracer.traceRay(rays);
+            imageWriter.writePixel(j, i, color);
+        }
+       /** Ray ray = constructRay(nX, nY, j, i);
         Color pixelColor = rayTracer.traceRay(ray);
-        return pixelColor;
+        return pixelColor;*/
+        return color;
     }
 
     public void printGrid(int interval, Color color) {
@@ -237,5 +252,76 @@ public class Camera {
         Vector vIJ = pIJ.subtract(this._p0);
 
         return new Ray( vIJ, _p0);
+    }
+    public List<Ray> constructBeamThroughPixel (int nX, int nY, int j, int i, int raysAmount)
+    {
+//		//æøé÷ú ëîåú ùì ÷øðééí ìúåê öåøú âøéã
+//		List<Ray> Rays = new ArrayList<Ray>();
+        int numOfRays = (int)Math.floor(Math.sqrt(raysAmount)); //num of rays in each row or column
+
+        if (numOfRays==1)
+            return List.of(constructRayThroughPixel(nX, nY, j, i));
+        Point Pc;
+        if (isZero(_distance))
+            Pc=_p0;
+        else
+            Pc=_p0.add(_vTo.scale(_distance));
+
+        double Ry= _height/nY;
+        double Rx=_width/nX;
+        double Yi=(i-(nY-1)/2d)*Ry;
+        double Xj=(j-(nX-1)/2d)*Rx;
+//
+        double PRy = Ry / numOfRays; //height distance between each ray
+        double PRx = Rx / numOfRays; //width distance between each ray
+//
+        //The distance between the screen and the camera cannot be 0
+        if (isZero(_distance))
+        {
+            throw new IllegalArgumentException("distance cannot be 0");
+        }
+
+        List<Ray> sampleRays = new ArrayList<>();
+
+
+        for (int row = 0; row < numOfRays; ++row)
+        {//foreach place in the pixel grid
+            for (int column = 0; column < numOfRays; ++column)
+            {
+                sampleRays.add(constructRaysThroughPixel(PRy,PRx,Yi, Xj, row, column));//add the ray
+            }
+        }
+        sampleRays.add(constructRayThroughPixel(nX, nY, j, i));//add the center screen ray
+        return sampleRays;
+    }
+    private Ray constructRaysThroughPixel(double Ry,double Rx, double yi, double xj, int j, int i)
+    {
+        Point Pc = _p0.add(_vTo.scale(_distance)); //the center of the screen point
+
+        double ySampleI =  (i *Ry + Ry/2d); //The pixel starting point on the y axis
+        double xSampleJ=   (j *Rx + Rx/2d); //The pixel starting point on the x axis
+
+        Point Pij = Pc; //The point at the pixel through which a beam is fired
+        //Moving the point through which a beam is fired on the x axis
+        if (!isZero(xSampleJ + xj))
+        {
+            Pij = Pij.add(_vRight.scale(xSampleJ + xj));
+        }
+        //Moving the point through which a beam is fired on the y axis
+        if (!isZero(ySampleI + yi))
+        {
+            Pij = Pij.add(_vUp.scale(-ySampleI -yi ));
+        }
+        Vector Vij = Pij.subtract(_p0);
+
+        return new Ray(_p0,Vij);//create the ray throw the point we calculate here
+    }
+    public Camera setNumOfRays(int numOfRays)
+    {
+        if(numOfRays == 0)
+            this.numOfRays=1;
+        else
+            this.numOfRays = numOfRays;
+        return this;
     }
 }

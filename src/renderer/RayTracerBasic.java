@@ -32,7 +32,27 @@ public class RayTracerBasic extends RayTracerBase {
         else
             return calcColor(ray.findClosestGeoPoint(intersectionsPoints), ray);
     }
+    /**
+     * @param rays List of surrounding rays
+     * @return average color
+     */
+    protected Color traceRay(List<Ray> rays)
+    {
+        if(rays == null)
+            return scene.background;
+        Color color = Color.BLACK;
+        Color bkg = scene.background;
+        for (Ray ray : rays)
+        {
+//        	GeoPoint gp = findClosestIntersection(ray);
+//        	color = color.add(gp == null ? bkg : calcColor(gp, ray, MAX_CALC_COLOR_LEVEL, 1d));
+            color = color.add(traceRay(ray));
+        }
+        color = color.add(scene.ambientLight.getIntensity());
+        int size = rays.size();
+        return color.reduce(size);
 
+    }
     /**
      * Calculate the color of a certain point
      *
@@ -109,7 +129,7 @@ public class RayTracerBasic extends RayTracerBase {
             else
                 color = color.add(scene.background.scale(kr));
         }
-
+     ///glih
 
         Double3 kt = gp.geometry.getMaterial().KT;
         Double3 kkt = k.product(kt);
