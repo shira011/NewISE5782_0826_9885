@@ -2,12 +2,12 @@ package primitives;
 
 public class Material {
     public int nShininess=0;
-    public Double3 KD= new Double3(0);
-    public Double3 KS = new Double3(0);
-    public Double3 KT= new Double3(0);
+    public Double3 KD= new Double3(0);////difusive mekadem
+    public Double3 KS = new Double3(0);//specular mekadem
+    public Double3 KT= new Double3(0);//transparency=refraction=shkifut mekadem
     //public Double3 KR=new Double3(0);
 
-    public Double3 KR =new Double3(0);
+    public Double3 KR =new Double3(0);////reflection=hishtakfut mekadem
 
     /**
      * @param nShininess the nShininess to set

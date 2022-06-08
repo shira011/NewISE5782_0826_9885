@@ -10,7 +10,7 @@ import primitives.Point;
 public abstract class Intersectable{
 
     /**
-     * A function that return all the intersection point with geometry
+     * A function that return all the intersection.הצטלבות point with geometry
      *
      * @param ray
      * @return List<Point>

@@ -60,7 +60,9 @@ public class Ray {
     /**
      *
      * @param geoPoints
-     * @return The closest point to the began of the ray
+     * this function gets a list of (intersection) points,
+     * and returns the closest point from them to p0-beginning of this ray.
+     * @return the GeoPoint in which its point is the closest to p0 of the ray.
      */
     public Intersectable.GeoPoint findClosestGeoPoint(List<Intersectable.GeoPoint> geoPoints) {
 
@@ -71,7 +73,7 @@ public class Ray {
             if (closePoint.point.distance(this.p) > p.point.distance(this.p)) //In case the distance of closes point is bigger than the p point
                 closePoint = p;
         }
-        return closePoint;
+        return closePoint;//return the closest point(and the geometry it intersects)-with min distance from p0.
     }
 
 

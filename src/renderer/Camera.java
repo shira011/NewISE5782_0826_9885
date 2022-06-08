@@ -2,7 +2,7 @@ package renderer;
 
 import geometries.Intersectable;
 import primitives.*;
-
+import  renderer.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,16 +17,21 @@ import static primitives.Util.isZero;
 public class Camera {
 
     private int numOfRays;
-    private Vector _vTo;            // vector pointing towards the scene
-    private Vector _vUp;            // vector pointing upwards
-    private Vector _vRight;
-    private Point _p0;             // camera eye
+    private Vector _vTo;            // vector pointing towards the scene vp המרחק מהמישור תצוגה
+    private Vector _vUp;            // vector pointing upwards direction up
+    private Vector _vRight;//כיוון המצלמה בצידה הימני
+    private Point _p0;             // camera eye location of the camera in the middel of the עדשה
 
     private double _distance;       // camera distance from view plane
     private double _width;          // view plane width
     private double _height;         // view plane height
     private ImageWriter imageWriter;
     private RayTracerBase rayTracer;
+
+    private int threadsCount = 0;
+    private static final int SPARE_THREADS = 3; // Spare threads if trying to use all the cores
+    private boolean print = false; // printing progress percentage
+
 
     public Vector getvTo() {
         return _vTo;
@@ -73,8 +78,6 @@ public class Camera {
         _vRight = _vTo.crossProduct(vUp).normalize();
     }
 
-    // chaining methods
-
     /**
      * set distance between the camera and its view plane
      *
@@ -91,7 +94,6 @@ public class Camera {
 
     /**
      * set view plane size
-     *
      * @param width  physical width
      * @param height physical height
      * @return
@@ -114,8 +116,58 @@ public class Camera {
         return this;
     }
 
+    /**
+     * Set multi-threading <br>
+     * - if the parameter is 0 - number of cores less 2 is taken
+     *
+     * @param threads number of threads
+     * @return the Render object itself
+     */
+    public Camera setMultithreading(int threads) {
+        if (threads < 0)
+            throw new IllegalArgumentException("Multithreading parameter must be 0 or higher");
+        if (threads != 0)
+            this.threadsCount = threads;
+        else {
+            int cores = Runtime.getRuntime().availableProcessors() - SPARE_THREADS;
+            this.threadsCount = cores <= 2 ? 1 : cores;
+        }
+        return this;
+    }
 
 
+
+
+    /**
+     * This function renders image's pixel color map from the scene included with
+     * the Renderer object - with multi-threading
+     */
+    public Camera renderImageThreaded() throws MissingResourceException{
+        if (imageWriter == null)
+            throw new MissingResourceException("All the render's fields mustn't be null, including the camera", "Camera", null);
+        if (rayTracer == null)
+            throw new MissingResourceException("All the render's fields mustn't be null, including the imageWriter", "ImageWriter", null);
+        final int nX = imageWriter.getNx();
+        final int nY = imageWriter.getNy();
+
+        Pixel.initialize(nY, nX, Pixel.printInterval);
+        while (threadsCount-- > 0) {
+            new Thread(() -> {
+                for (Pixel pixel = new Pixel(); pixel.nextPixel(); Pixel.pixelDone())
+                    castRay(nX, nY, pixel.col, pixel.row, numOfRays);
+            }).start();
+        }
+        Pixel.waitToFinish();
+        return this;
+    }
+
+
+    /**
+     * This function renders image's pixel color map from the scene included with
+     * the Renderer object
+     * פונקציה זו מציגה את מפת צבע הפיקסלים של התמונה מהסצנה הכלולה בה
+     * האובייקט Render
+     */
     public Camera renderImage() {
         try {
             if (imageWriter == null) {
@@ -124,21 +176,28 @@ public class Camera {
             if (rayTracer == null) {
                 throw new MissingResourceException("missing resource", RayTracerBase.class.getName(), "");
             }
-
             //rendering the image
             int nX = imageWriter.getNx();
             int nY = imageWriter.getNy();
-            for (int i = 0; i < nY; i++) {
-                for (int j = 0; j < nX; j++) {
+            if (threadsCount == 0)
+             for (int i = 0; i < nY; i++)
+                 for (int j = 0; j < nX; j++)
                     imageWriter.writePixel(j, i, castRay(nX, nY, j, i,numOfRays));
-                }
-            }
+
+            else  renderImageThreaded();//if process is with multi-threading
         } catch (MissingResourceException e) {
             throw new UnsupportedOperationException("Not implemented yet" + e.getClassName());
         }
         return this;
     }
 
+    /**
+     * Cast ray from camera in order to color a pixel
+     * @param nX resolution on X axis (number of pixels in row)
+     * @param nY resolution on Y axis (number of pixels in column)
+     * @param j pixel's column number (pixel index in row)
+     * @param i pixel's row number (pixel index in column)
+     */
     private Color castRay(int nX, int nY, int j, int i, int numOfRays) {
         Color color;
         if(numOfRays == 1 || numOfRays == 0)
@@ -153,12 +212,16 @@ public class Camera {
              color = rayTracer.traceRay(rays);
             imageWriter.writePixel(j, i, color);
         }
-       /** Ray ray = constructRay(nX, nY, j, i);
-        Color pixelColor = rayTracer.traceRay(ray);
-        return pixelColor;*/
         return color;
     }
 
+    /**
+     * Create a grid [over the picture] in the pixel color map. given the grid's
+     * step and color.
+     *
+     * @param interval  grid's step
+     * @param color grid's color
+     */
     public void printGrid(int interval, Color color) {
         if (imageWriter == null)
             throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
@@ -173,10 +236,14 @@ public class Camera {
         }
     }
 
+
+    /**
+     * the final action of producing the wanted image
+     */
     public void writeToImage() {
-        if (imageWriter == null)
+        if (imageWriter == null)//if the imageWriter field, that creates the image, is missing in Render-
             throw new MissingResourceException("missing resource", ImageWriter.class.getName(), "");
-        imageWriter.writeToImage();
+        imageWriter.writeToImage();//delegate the writing to image to imageWriter, that deals with it.
 
     }
 
@@ -220,14 +287,13 @@ public class Camera {
         return new Ray(dir,_p0);
     }
     /**
-     * Calculates the ray that goes through the middle of a pixel i,j on the view
-     * plane
-     *
-     * @param nX
-     * @param nY
-     * @param j
-     * @param i
-     * @return The ray that goes through the middle of a pixel i,j on the view plane
+     * The function is responsible for creating the rays from the camera
+     * @param nX int value - resolution of pixel in X
+     * @param nY int value - resolution of pixel in Y
+     * @param j int value - index of column
+     * @param i int value - index of row
+     * @return Ray that created
+     * @throws Exception
      */
     public Ray constructRayThroughPixel(int nX, int nY, int j, int i) {
         // Image center:
@@ -294,6 +360,19 @@ public class Camera {
         sampleRays.add(constructRayThroughPixel(nX, nY, j, i));//add the center screen ray
         return sampleRays;
     }
+    /**
+     * In this function we treat each pixel like a little screen of its own and divide it to smaller "pixels".
+     * Through each one we construct a ray. This function is similar to ConstructRayThroughPixel.
+     * בפונקציה זו אנו מתייחסים לכל פיקסל כאל מסך קטן משלו ומחלקים אותו ל"פיקסלים" קטנים יותר.
+     *      * דרך כל אחד בונים קרן. פונקציה זו דומה ל-ConstructRayThroughPixel.
+     * @param Ry height of each grid block we divided the pixel into
+     * @param Rx width of each grid block we divided the pixel into
+     * @param yi distance of original pixel from (0,0) on Y axis
+     * @param xj distance of original pixel from (0,0) on X axis
+     * @param j j coordinate of small "pixel"
+     * @param i i coordinate of small "pixel"
+     * @return beam of rays through pixel
+     */
     private Ray constructRaysThroughPixel(double Ry,double Rx, double yi, double xj, int j, int i)
     {
         Point Pc = _p0.add(_vTo.scale(_distance)); //the center of the screen point
@@ -322,6 +401,10 @@ public class Camera {
             this.numOfRays=1;
         else
             this.numOfRays = numOfRays;
+        return this;
+    }
+    public Camera setDebugPrint(double d) {
+        print = true;
         return this;
     }
 }

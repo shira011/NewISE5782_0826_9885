@@ -14,6 +14,10 @@ import javax.imageio.*;
  * producing a non-optimized jpeg image from this matrix. The class although is
  * responsible of holding image related parameters of View Plane - pixel matrix
  * size and resolution
+ * שיעור כותב תמונות משלב צבירת מטריצת צבע פיקסלים ולבסוף
+ *  * הפקת תמונת jpeg לא מותאמת ממטריצה . הכיתה אמנם היא
+ *  * אחראי על החזקת פרמטרים הקשורים לתמונה של View Plane - מטריצת פיקסל
+ *  *גודל ורזולוציה
  *
  * @author Dan
  */
