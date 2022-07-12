@@ -9,30 +9,31 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Geometries extends Intersectable {
+public class Geometries extends Borderable {
 
-    List<Intersectable> _intersectablesList;
+    List<Borderable> geometriesInScene;
 
     public Geometries() {
-        _intersectablesList = new LinkedList<>();
+        geometriesInScene = new LinkedList<>();
     }
 
-    public Geometries(Intersectable... intersectables) {
-        _intersectablesList = List.of(intersectables);
+    public Geometries(Borderable... intersectables) {
+        geometriesInScene = List.of(intersectables);
     }
 
-    public void add(Intersectable... intersectables) {
-        _intersectablesList.addAll(List.of(intersectables));
+    public void add(Borderable... intersectables) {
+        geometriesInScene.addAll(List.of(intersectables));
     }
 
-
-
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        if (_intersectablesList.isEmpty()) // In case the collection is empty
+    /**
+     * find all  geo point with the ray
+     */
+    public List<GeoPoint> findGeoIntersectionsParticular(Ray ray) {
+        if (geometriesInScene.isEmpty()) // In case the collection is empty
             return null;
 
         List<GeoPoint> points = null, result;
-        for (Intersectable body: _intersectablesList) {
+        for (Intersectable body: geometriesInScene) {
             result = body.findGeoIntersectionsHelper(ray);
             if(result != null){
                 if(points == null)
@@ -42,6 +43,40 @@ public class Geometries extends Intersectable {
             }
         }
         return points;
+    }
+
+    @Override
+    protected void findMinMaxParticular() {
+        minX = Double.POSITIVE_INFINITY;
+        maxX = Double.NEGATIVE_INFINITY;
+        minY = Double.POSITIVE_INFINITY;
+        maxY = Double.NEGATIVE_INFINITY;
+        minZ = Double.POSITIVE_INFINITY;
+        maxZ = Double.NEGATIVE_INFINITY;
+
+        /**
+         * find the minimum and the maximum of the geometry border
+         */
+
+        for (Borderable g : geometriesInScene) {
+            g.findMinMax();
+
+            //calc min
+            if (g.minX < minX)
+                minX = g.minX;
+            if (g.minY < minY)
+                minY = g.minY;
+            if (g.minZ < minZ)
+                minZ = g.minZ;
+
+            //calc max
+            if (g.maxX > maxX)
+                maxX = g.maxX;
+            if (g.maxY > maxY)
+                maxY = g.maxY;
+            if (g.maxZ > maxZ)
+                maxZ = g.maxZ;
+        }
     }
 }
 

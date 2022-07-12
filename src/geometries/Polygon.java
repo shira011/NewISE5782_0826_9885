@@ -89,10 +89,14 @@ public class Polygon extends Geometry {
         return plane.getNormal();
     }
 
+    @Override
+    public Point getPositionPoint() {
+        return vertices.get(0);
+    }
 
 
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsParticular(Ray ray) {
 
         return  null;
        /* List<GeoPoint> planeIntersections = plane.findGeoIntersectionsHelper(ray);
@@ -134,6 +138,32 @@ public class Polygon extends Geometry {
         }
 
         return planeIntersections;*/
+    }
+
+    @Override
+    protected void findMinMaxParticular() {
+        minX = Double.POSITIVE_INFINITY;
+        maxX = Double.NEGATIVE_INFINITY;
+        minY = Double.POSITIVE_INFINITY;
+        maxY = Double.NEGATIVE_INFINITY;
+        minZ = Double.POSITIVE_INFINITY;
+        maxZ = Double.NEGATIVE_INFINITY;
+        // Adjust the size of the box according to the vertices
+        for (Point v : vertices) {
+            if (v.getD1() < minX)
+                minX = v.getD1();
+            if (v.getD1() > maxX)
+                maxX = v.getD1();
+            if (v.getD2() < minY)
+                minY = v.getD2();
+            if (v.getD2() > maxY)
+                maxY = v.getD2();
+            if (v.getD3() < minZ)
+                minZ = v.getD3();
+            if (v.getD3() > maxZ)
+                maxZ = v.getD3();
+        }
+
     }
 }
 

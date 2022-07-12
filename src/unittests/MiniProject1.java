@@ -71,7 +71,7 @@ public class MiniProject1 {
     }
     @Test
     public void ourPicture() {
-        ImageWriter imageWriter2 = new ImageWriter("ourPicture4x4ASS", 900, 600);
+        ImageWriter imageWriter2 = new ImageWriter("ourPicture4x4ASS2", 900, 600);
         Camera camera = new Camera(new Point(689, 777, -100), new Vector(-597, -754, -46), new Vector(0, -46, 754)) //
                 .setVPSize(337, 225).setVPDistance(1200);
 
@@ -198,8 +198,8 @@ public class MiniProject1 {
                 .setKl(0.00001).setKQ(0.000001));
 
 
-       // scene.lights.add(new PointLight(new Color(500, 500, 500), new Point(100, 0, -100)).setKQ(0.000001));
-        camera.setNumOfRays(110).setImageWriter(imageWriter2).setMultithreading(3).setDebugPrint(0.1) //
+
+        camera.setNumOfRays(1).setImageWriter(imageWriter2).setMultithreading(3).setDebugPrint(0.1) //
                 .setRayTracer(new RayTracerBasic(scene)) //
                 .renderImage() //
                 .writeToImage();

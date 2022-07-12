@@ -40,6 +40,11 @@ public class Sphere extends Geometry {
         Vector N = p.subtract(center);
         return N.normalize();//the normal to sphere is the subtraction of the given point from the center. we get the normal vector
     }
+
+    @Override
+    public Point getPositionPoint() {
+        return center;
+    }
     /*************** gets *****************/
     /**
      * @return the center
@@ -109,7 +114,7 @@ public class Sphere extends Geometry {
 
     }*/
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray)
+    public List<GeoPoint> findGeoIntersectionsParticular(Ray ray)
     {
         double r = this.radius;
 
@@ -151,4 +156,13 @@ public class Sphere extends Geometry {
     }
 
 
+    @Override
+    protected void findMinMaxParticular() {
+        minX = center.getD1() - radius;
+        maxX = center.getD1() + radius;
+        minY = center.getD2() - radius;
+        maxY = center.getD2() + radius;
+        minZ = center.getD3() - radius;
+        maxZ = center.getD3() + radius;
+    }
 }

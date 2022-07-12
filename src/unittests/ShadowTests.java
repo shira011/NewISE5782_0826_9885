@@ -31,7 +31,7 @@ public class ShadowTests {
      * Helper function for the tests in this module
      */
     void sphereTriangleHelper(String pictName, Triangle triangle, Point spotLocation) {
-        scene.geometries.add(sphere, triangle.setEmission(new Color(BLUE)).setMaterial(trMaterial));
+        scene.geometries.add((Borderable) sphere, triangle.setEmission(new Color(BLUE)).setMaterial(trMaterial));
         scene.lights.add( //
                 new SpotLight(new Color(400, 240, 0), spotLocation, new Vector(1, 1, -3)) //
                         .setKl(1E-5).setKQ(1.5E-7));

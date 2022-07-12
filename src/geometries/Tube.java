@@ -56,11 +56,16 @@ public class Tube extends Geometry {
     }
 
     @Override
+    public Point getPositionPoint() {
+        return null;
+    }
+
+    @Override
     public String toString() {
         return "Tube [axisRay=" + axisRay + ", radius=" + radius + "]";
     }
     @Override
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsParticular(Ray ray) {
         return  null;
         /*Vector vAxis = axisRay.getVector();
         Vector v = ray.getVector();
@@ -137,5 +142,10 @@ public class Tube extends Geometry {
             return List.of(new GeoPoint(this,ray.getPoint(t1)),new GeoPoint(this, ray.getPoint(t2)));
         else // t2 is behind the head
             return List.of(new GeoPoint(this,ray.getPoint(t1)));*/
+    }
+
+    @Override
+    protected void findMinMaxParticular() {
+
     }
 }

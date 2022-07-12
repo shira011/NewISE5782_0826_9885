@@ -56,6 +56,11 @@ public class Plane extends Geometry {
         return normal;
     }
 
+    @Override
+    public Point getPositionPoint() {
+        return q0;
+    }
+
     /*************** normalize *****************/
     /**
      * @return the normal vector
@@ -92,7 +97,7 @@ public class Plane extends Geometry {
 
 
 
-    public List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    public List<GeoPoint> findGeoIntersectionsParticular(Ray ray) {
 
         if (ray.getPoint().equals(q0) || isZero(this.normal.dotProduct(ray.getVector()))
                 || isZero(this.normal.dotProduct(q0.subtract(ray.getPoint()))))
@@ -107,5 +112,16 @@ public class Plane extends Geometry {
         LinkedList<GeoPoint> result = new LinkedList<GeoPoint>();
         result.add(p);
         return result;
+    }
+
+    @Override
+    protected void findMinMaxParticular() {
+        minX= Double.NEGATIVE_INFINITY;
+        minY= Double.NEGATIVE_INFINITY;
+        minZ= Double.NEGATIVE_INFINITY;
+
+        maxX = Double.POSITIVE_INFINITY;
+        maxY = Double.POSITIVE_INFINITY;
+        maxZ =  Double.POSITIVE_INFINITY;
     }
 }
